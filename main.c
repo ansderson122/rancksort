@@ -97,21 +97,4 @@ int *gerar_vetor_inteiro(int n) {
 }
 
 
-int *rankSort_serial(int* vetor, int tamanho){
-   	int con = 0; 
-   	int vetor_ordenado[tamanho];
-   	
-   	
-   	for(int i = 0; i < tamanho; i++){
-   		for(int j = 0; j < tamanho; j++){
-   			if (vetor[i] < vetor[j]){
-   				con++;
-			}
-		}
-		vetor_ordenado[con] = vetor[i];
-		con = 0; 
-	}
-	int *res = vetor_ordenado;
-	
-	return res;
-}
+
