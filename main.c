@@ -75,8 +75,8 @@ void main(){
 
 
 
-    printf("Execução serial: %.5f \n",tempo_serial);
-    printf("Execução paralela: %.5f \n",tempo_paralelo);
+    printf("Execuï¿½ï¿½o serial: %.5f \n",tempo_serial);
+    printf("Execuï¿½ï¿½o paralela: %.5f \n",tempo_paralelo);
     double speedup = tempo_serial/tempo_paralelo;
 	printf("Speedup: %.4f\n", speedup);
 	printf("Eficiencia: %.4f\n\n",speedup/4.0);
