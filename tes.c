@@ -4,6 +4,7 @@
 #include <unistd.h>
 
 int *gerar_vetor_inteiro(int n);
+double media(double * v,int t);
 
 int ranckSort(int t) {
     int* vetor = NULL;
@@ -11,9 +12,7 @@ int ranckSort(int t) {
 
     int con = 0;
     int* vetor_ordenado = (int*)malloc(sizeof(int) * t);
-    double tempo;
-
-    clock_t start = clock();
+       
     for (int i = 0; i < t; i++) {
         for (int j = 0; j < t; j++) {
             if (vetor[i] < vetor[j]) {
@@ -23,19 +22,26 @@ int ranckSort(int t) {
         vetor_ordenado[con] = vetor[i];
         con = 0;
     }
-    clock_t end = clock();
-    tempo =((double)(end - start)) / CLOCKS_PER_SEC;
-
-
-    printf("Para o tamanho %i o tempo foi: %.5f segundos\n", t, tempo);
+   
+   
     free(vetor);
     free(vetor_ordenado);
     return 1;
 }
 
 int main() {
+	double tempo, tempos[10],tempoMedio;
     for (int i = 10; i < 10000000; i *= 10) {
-        ranckSort(i);
+    	for(int j = 0;j < 10; j++){
+    		clock_t start = clock();
+    		ranckSort(i);
+    		clock_t end = clock();
+    		tempo =((double)(end - start)) / CLOCKS_PER_SEC;
+    		tempos[j] = tempo;
+		}
+		tempoMedio = media(tempos,10);
+		
+        printf("Para o tamanho %i o tempo foi: %.5f segundos\n", i, tempoMedio);
     }
 
     return 0;
@@ -51,3 +57,10 @@ int* gerar_vetor_inteiro(int n) {
     return vetor;
 }
 
+double media(double * v,int t){
+	double soma;
+	for (int i = 0; i < t;i++){
+		soma += v[i];
+	}
+	return (soma /(double) t);
+}
