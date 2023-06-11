@@ -65,7 +65,7 @@ int main(int argc, char** argv) {
         for (int j = 0; j < t; j++) {
             if (aux[i] < vetor[j]){
                 local_rank[i]++;
-            }else if(aux[i] == vetor[j] && i > j){
+            }else if(aux[i] == vetor[j] && (rank +(i*size)) > j){
               	local_rank[i]++;
             }
         }
