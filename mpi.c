@@ -17,6 +17,7 @@ int main(int argc, char** argv) {
     int t = 10;
     int* vetor = NULL;
     int* vetor_ordenado = NULL;
+    int* subvetor = NULL;
     
     
     
@@ -28,70 +29,70 @@ int main(int argc, char** argv) {
       vetor = gerar_vetor_inteiro(t);
       vetor_ordenado = (int *)malloc(sizeof(int) * t);
       
+      
       printf("Vetor : ");
         for (int i = 0; i < t; i++) {
             printf("%d ", vetor[i]);
         }
         printf("\n");
     }
-    MPI_Bcast(&t,1,MPI_INT,0,MPI_COMM_WORLD);
-    MPI_Bcast(&vetor,1,MPI_INT,0,MPI_COMM_WORLD);
- 
-   MPI_Win win;
-   MPI_Win_allocate_shared(t *sizeof(int),sizeof(int), MPI_INFO_NULL,MPI_COMM_WORLD,&vetor_ordenado,&win );
-   
-   MPI_Win_fence(0,win);
 
- 
-    
-    MPI_Barrier(MPI_COMM_WORLD);
+    if (rank != 0){
+        vetor = (int*)malloc(sizeof(int) * t);
+    }
+    MPI_Bcast(&t,1,MPI_INT,0,MPI_COMM_WORLD);
+    MPI_Bcast(vetor,t,MPI_INT,0,MPI_COMM_WORLD);   
     
     int sub_size = (int)(t/size);
-    int aux[sub_size];
-    
-    printf("sub_size %i \n",sub_size);
-    printf("size %i \n",size);
-    
-    for(int i = rank ; i < sub_size ; i += size){
-    	aux[i] = vetor[i];
-    }
-    
-    int local_rank[sub_size];
+
+    subvetor = malloc(sub_size*sizeof(int));
+    MPI_Scatter(vetor, sub_size, MPI_INT, subvetor,sub_size, MPI_INT, 0, MPI_COMM_WORLD);
+   
+    int vRankLocal[sub_size];
     for (int i = 0; i < sub_size;i++){
-    	local_rank[i] = 0;
+    	vRankLocal[i] = 0;
     }
     
     for (int i = 0; i < sub_size; i++) {
         for (int j = 0; j < t; j++) {
-            if (aux[i] < vetor[j]){
-                local_rank[i]++;
-            }else if(aux[i] == vetor[j] && (rank +(i*size)) > j){
-              	local_rank[i]++;
+            if (subvetor[i] < vetor[j]){
+                vRankLocal[i]++;
+            }else if(subvetor[i] == vetor[j] && (rank +(i*size)) > j){
+              	vRankLocal[i]++;
             }
         }
     }
-    
-    
-    for(int i = 0; i < sub_size;i++ ){
-    	//printf("local_rank %i \n",local_rank[i]);
-    	vetor_ordenado[local_rank[i]] = aux[i];
+
+    int* vetor_rank = NULL;
+    if(rank == 0){
+        vetor_rank = malloc(t*sizeof(int));
+
     }
     
+    MPI_Gather(&vRankLocal, sub_size , MPI_INT, vetor_rank, t, MPI_INT, 0, MPI_COMM_WORLD);
 
-    MPI_Barrier(MPI_COMM_WORLD);
+    
+
+    
     // Imprime o vetor ordenado no processo 0
     if (rank == 0) {
+        for(int i = 0; i < t ; i++){
+            vetor_ordenado[vetor_rank[i]] = vetor[i]
+        }
+
+
         printf("Vetor ordenado: ");
         for (int i = 0; i < t; i++) {
             printf("%d ", vetor_ordenado[i]);
         }
         printf("\n");
+        free(vetor_ordenado);
         
     }
 	free(vetor);
     
   
-    free(vetor_ordenado);
+    
 
     MPI_Finalize();
     return 0;
