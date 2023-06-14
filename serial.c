@@ -9,16 +9,19 @@ int ranckSort(int t) {
     int* vetor = NULL;
     vetor = gerar_vetor_inteiro(t);
 
-    int con = 0;
+    
     int* vetor_ordenado = (int*)malloc(sizeof(int) * t);
     double tempo;
 
     clock_t start = clock();
+	int con = 0;
     for (int i = 0; i < t; i++) {
         for (int j = 0; j < t; j++) {
             if (vetor[i] < vetor[j]) {
                 con++;
-            }
+            } else if (vetor[i] == vetor[j] && i > j){
+            	con++;
+			}
         }
         vetor_ordenado[con] = vetor[i];
         con = 0;

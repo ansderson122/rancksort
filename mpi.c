@@ -14,11 +14,11 @@ int main(int argc, char** argv) {
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     
     
-    int t = 10;
+    int t = 100000;
     int* vetor = NULL;
     int* vetor_ordenado = NULL;
     int* subvetor = NULL;
-    
+    clock_t start;
     
     
     if (rank == 0){
@@ -28,14 +28,17 @@ int main(int argc, char** argv) {
     	}
       vetor = gerar_vetor_inteiro(t);
       vetor_ordenado = (int *)malloc(sizeof(int) * t);
+      start = clock();
       
-      
+      /*
       printf("Vetor : ");
         for (int i = 0; i < t; i++) {
             printf("%d ", vetor[i]);
         }
         printf("\n");
+        */
     }
+    
 
     if (rank != 0){
         vetor = (int*)malloc(sizeof(int) * t);
@@ -57,7 +60,7 @@ int main(int argc, char** argv) {
         for (int j = 0; j < t; j++) {
             if (subvetor[i] < vetor[j]){
                 vRankLocal[i]++;
-            }else if(subvetor[i] == vetor[j] && (rank +(i*size)) > j){
+            }else if(subvetor[i] == vetor[j] && (i +(rank*sub_size)) > j){
               	vRankLocal[i]++;
             }
         }
@@ -69,7 +72,7 @@ int main(int argc, char** argv) {
 
     }
     
-    MPI_Gather(&vRankLocal, sub_size , MPI_INT, vetor_rank, t, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Gather(&vRankLocal, sub_size , MPI_INT, vetor_rank, sub_size, MPI_INT, 0, MPI_COMM_WORLD);
 
     
 
@@ -77,20 +80,26 @@ int main(int argc, char** argv) {
     // Imprime o vetor ordenado no processo 0
     if (rank == 0) {
         for(int i = 0; i < t ; i++){
-            vetor_ordenado[vetor_rank[i]] = vetor[i]
+            vetor_ordenado[vetor_rank[i]] = vetor[i];
         }
+        
+        clock_t end = clock();
+    	double tempo = ((double)(end - start)) / CLOCKS_PER_SEC;
 
+    	printf("Para o tamanho %i o tempo foi: %.5f segundos\n", t, tempo);
 
+	/*
         printf("Vetor ordenado: ");
         for (int i = 0; i < t; i++) {
             printf("%d ", vetor_ordenado[i]);
         }
         printf("\n");
+        */
         free(vetor_ordenado);
         
     }
-	free(vetor);
-    
+	
+    free(vetor);
   
     
 
@@ -102,7 +111,7 @@ int* gerar_vetor_inteiro(int n) {
     int* vetor;
     vetor = (int*)malloc(sizeof(int) * n);
     for (long int i = 0; i < n; i++) {
-        int num = rand() % 11;
+        int num = rand() ;
         vetor[i] = num;
     }
     return vetor;

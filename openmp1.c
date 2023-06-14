@@ -24,7 +24,9 @@ int ranckSort(int t) {
             for (int j = 0; j < t; j++) {
                 if (vetor[i] < vetor[j]) {
                     con++;
-                }
+                }else if(vetor[i] < vetor[j] && i>j){
+                	con++;
+				}
             }
             vetor_ordenado[con] = vetor[i];
             con = 0;
